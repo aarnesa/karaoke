@@ -1,5 +1,10 @@
 import { expect, test, type Page } from '@playwright/test';
+import { readFileSync } from 'node:fs';
 import { parseSongs } from '../src/songs';
+
+const catalog = parseSongs(JSON.parse(
+  readFileSync(new URL('../public/songs.json', import.meta.url), 'utf8'),
+));
 
 interface TestWindow extends Window {
   calls: string[];
@@ -36,6 +41,9 @@ async function mockYouTube(page: Page, ready: Promise<void> = Promise.resolve())
 }
 
 test('allowlist validates entries and rejects malformed or duplicate IDs', () => {
+  expect(catalog).toHaveLength(27);
+  expect(catalog.some(song => song.title === 'Golden')).toBe(true);
+  expect(catalog.some(song => song.title === 'Tuiki tuiki tähtönen')).toBe(true);
   expect(parseSongs([{ id: 'bGstj8YPotg', title: ' Laulu ', artist: ' Perhe ' }]))
     .toEqual([{ id: 'bGstj8YPotg', title: 'Laulu', artist: 'Perhe' }]);
   for (const invalid of [null, [], {}, [{ id: 'https://youtube.com', title: 'x', artist: 'y' }],
@@ -48,7 +56,7 @@ test('allowlist validates entries and rejects malformed or duplicate IDs', () =>
 test('Finnish grid is curated, responsive and has no search', async ({ page }) => {
   await page.goto('./');
   await expect(page.getByRole('heading', { name: 'Mitä tänään lauletaan?' })).toBeVisible();
-  await expect(page.locator('.song-card')).toHaveCount(3);
+  await expect(page.locator('.song-card')).toHaveCount(catalog.length);
   await expect(page.getByRole('searchbox')).toHaveCount(0);
   await page.setViewportSize({ width: 390, height: 844 });
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
@@ -129,12 +137,12 @@ test('malformed allowlist fails closed', async ({ page }) => {
 
 test('installed shell opens offline but explains videos need internet', async ({ page, context }) => {
   await page.goto('./');
-  await expect(page.locator('.song-card')).toHaveCount(3);
+  await expect(page.locator('.song-card')).toHaveCount(catalog.length);
   await page.evaluate(async () => { await navigator.serviceWorker.ready; });
   await page.reload();
-  await expect(page.locator('.song-card')).toHaveCount(3);
+  await expect(page.locator('.song-card')).toHaveCount(catalog.length);
   await context.setOffline(true);
   await page.reload();
-  await expect(page.locator('.song-card')).toHaveCount(3);
+  await expect(page.locator('.song-card')).toHaveCount(catalog.length);
   await expect(page.locator('#notice')).toContainText('Laulujen toisto tarvitsee verkkoyhteyden');
 });

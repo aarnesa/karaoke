@@ -6,6 +6,30 @@ isot toisto-, tauko-, alusta- ja paluupainikkeet. Ei hakua eikä videosyötettä
 
 Sovellus: https://aarnesa.github.io/karaoke/
 
+## Isommille laulajille
+
+Listan alussa on 24 yksittäistä pop- ja elokuvakappaletta noin 10-vuotiaille ja
+sitä vanhemmille: esimerkiksi Golden, Taylor Swiftin kappaleita, ABBAa,
+The Final Countdown sekä Frozenin, Moanan ja Encanton lauluja.
+Alkuperäiset kolme lastenlaulua ovat edelleen listan lopussa.
+
+Uusissa versioissa on ruudulla sanat ja taustalaulu tai mukana laulava ääni.
+Kortin teksti kertoo eron: **taustalaulu** tukee osaa kappaleesta, ei välttämättä
+koko melodiaa. **Mukana laulava ääni** laulaa päämelodiaa, eikä sen voimakkuutta
+voi säätää erikseen. I See the Light on duetto: video laulaa Flynnin osuuden,
+ja lapsi laulaa Rapunzelin osuuden. Taustalaulun määrä vaihtelee videoittain.
+
+Pitkiä soittolistakokoelmia ei upoteta, koska niiden kaikkia kappaleita ei voi
+rajata erikseen. Valinnassa on vältetty kiroilua sekä seksuaalisia, päihde- ja
+väkivaltapainotteisia kappaleita; mukana on tavallisia ihastus- ja rakkauslauluja.
+Kyse ei ole virallisesta ikäluokituksesta: vanhemman pitää silti katsoa ja
+kuunnella valitut versiot ennen lapsen käyttöä. Videot eivät ole omia
+äänimuokkauksia, vaan julkaisijoiden valmiita karaokeversioita.
+
+Uusien videoiden tunnukset, nimet ja upotuksen salliminen tarkistettiin
+YouTuben oEmbed-palvelusta. KaraFunin ja osan Sing Kingin videoiden upotus oli
+estetty, joten niitä ei lisätty. Saatavuus voi muuttua myöhemmin.
+
 ## Lisää tai poista laulu
 
 Muokkaa tiedostoa [`public/songs.json`](public/songs.json) GitHubissa ja tallenna
