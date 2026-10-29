@@ -1,0 +1,2 @@
+# karaoke
+Lasten karaoke (yksityinen)
