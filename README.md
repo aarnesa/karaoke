@@ -6,18 +6,27 @@ isot toisto-, tauko-, alusta- ja paluupainikkeet. Ei hakua eikä videosyötettä
 
 Sovellus: https://aarnesa.github.io/karaoke/
 
+## Kielivalitsin
+
+Etusivun valitsimilla voi näyttää kaikki 45 laulua tai rajata listan suomen- tai
+englanninkielisiin lauluihin. Kieli kertoo videon laulukielen, ei käyttöliittymän
+kieltä. Jokaisessa [`public/songs.json`](public/songs.json)-tietueessa on kenttä
+`"language": "fi"` tai `"language": "en"`.
+
 ## Isommille laulajille
 
-Listan alussa on 24 yksittäistä pop- ja elokuvakappaletta noin 10-vuotiaille ja
-sitä vanhemmille: esimerkiksi Golden, Taylor Swiftin kappaleita, ABBAa,
-The Final Countdown sekä Frozenin, Moanan ja Encanton lauluja.
-Alkuperäiset kolme lastenlaulua ovat edelleen listan lopussa.
+Listalla on yksittäisiä englannin- ja suomenkielisiä kappaleita koko perheelle:
+esimerkiksi Golden, Taylor Swiftin kappaleita, ABBAa, Beatlesia, suomalaisia
+klassikoita sekä Frozenin, Moanan ja Encanton lauluja. Alkuperäiset kolme
+lastenlaulua ovat edelleen listan lopussa.
 
 Uusissa versioissa on ruudulla sanat ja taustalaulu tai mukana laulava ääni.
 Kortin teksti kertoo eron: **taustalaulu** tukee osaa kappaleesta, ei välttämättä
 koko melodiaa. **Mukana laulava ääni** laulaa päämelodiaa, eikä sen voimakkuutta
-voi säätää erikseen. I See the Light on duetto: video laulaa Flynnin osuuden,
-ja lapsi laulaa Rapunzelin osuuden. Taustalaulun määrä vaihtelee videoittain.
+voi säätää erikseen. **Laulun sanat ja alkuperäinen lauluääni** tarkoittaa
+varsinaisen kappaleen laulua tekstityksellä, ei karaokeversiota. I See the Light
+on duetto: video laulaa Flynnin osuuden, ja lapsi laulaa Rapunzelin osuuden.
+Taustalaulun määrä vaihtelee videoittain.
 
 Pitkiä soittolistakokoelmia ei upoteta, koska niiden kaikkia kappaleita ei voi
 rajata erikseen. Valinnassa on vältetty kiroilua sekä seksuaalisia, päihde- ja
@@ -40,7 +49,8 @@ Lisää esimerkiksi seuraava olio listan sisään (erota oliot pilkuilla):
 {
   "id": "nKNoPrJsWa0",
   "title": "Tuiki tuiki tähtönen",
-  "artist": "Lasten Lauluja · laula mukana"
+  "artist": "Lasten Lauluja · laula mukana",
+  "language": "fi"
 }
 ```
 

@@ -41,14 +41,18 @@ async function mockYouTube(page: Page, ready: Promise<void> = Promise.resolve())
 }
 
 test('allowlist validates entries and rejects malformed or duplicate IDs', () => {
-  expect(catalog).toHaveLength(27);
+  expect(catalog).toHaveLength(45);
   expect(catalog.some(song => song.title === 'Golden')).toBe(true);
   expect(catalog.some(song => song.title === 'Tuiki tuiki tähtönen')).toBe(true);
-  expect(parseSongs([{ id: 'bGstj8YPotg', title: ' Laulu ', artist: ' Perhe ' }]))
-    .toEqual([{ id: 'bGstj8YPotg', title: 'Laulu', artist: 'Perhe' }]);
+  expect(parseSongs([{ id: 'bGstj8YPotg', title: ' Laulu ', artist: ' Perhe ', language: 'fi' }]))
+    .toEqual([{ id: 'bGstj8YPotg', title: 'Laulu', artist: 'Perhe', language: 'fi' }]);
   for (const invalid of [null, [], {}, [{ id: 'https://youtube.com', title: 'x', artist: 'y' }],
-    [{ id: 'bGstj8YPotg', title: ' ', artist: 'y' }],
-    [1], [{ id: 'bGstj8YPotg', title: 'x', artist: 'y' }, { id: 'bGstj8YPotg', title: 'x', artist: 'y' }]]) {
+    [{ id: 'bGstj8YPotg', title: ' ', artist: 'y', language: 'fi' }],
+    [{ id: 'bGstj8YPotg', title: 'x', artist: 'y', language: 'sv' }],
+    [1], [
+      { id: 'bGstj8YPotg', title: 'x', artist: 'y', language: 'fi' },
+      { id: 'bGstj8YPotg', title: 'x', artist: 'y', language: 'en' },
+    ]]) {
     expect(() => parseSongs(invalid)).toThrow();
   }
 });
@@ -58,6 +62,18 @@ test('Finnish grid is curated, responsive and has no search', async ({ page }) =
   await expect(page.getByRole('heading', { name: 'Mitä tänään lauletaan?' })).toBeVisible();
   await expect(page.locator('.song-card')).toHaveCount(catalog.length);
   await expect(page.getByRole('searchbox')).toHaveCount(0);
+  await page.getByRole('button', { name: 'Suomi' }).click();
+  const finnishSongs = catalog.filter(song => song.language === 'fi');
+  await expect(page.locator('.song-card')).toHaveCount(finnishSongs.length);
+  await expect(page.locator('.song-card').first()).toContainText(finnishSongs[0].title);
+  await expect(page.getByRole('button', { name: 'Suomi' })).toHaveAttribute('aria-pressed', 'true');
+  await page.getByRole('button', { name: 'Englanti' }).click();
+  const englishSongs = catalog.filter(song => song.language === 'en');
+  await expect(page.locator('.song-card')).toHaveCount(englishSongs.length);
+  await expect(page.locator('.song-card').first()).toContainText(englishSongs[0].title);
+  await expect(page.getByRole('button', { name: 'Englanti' })).toHaveAttribute('aria-pressed', 'true');
+  await page.getByRole('button', { name: 'Kaikki' }).click();
+  await expect(page.locator('.song-card')).toHaveCount(catalog.length);
   await page.setViewportSize({ width: 390, height: 844 });
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
 });

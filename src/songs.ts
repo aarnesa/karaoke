@@ -2,6 +2,7 @@ export interface Song {
   id: string;
   title: string;
   artist: string;
+  language: 'fi' | 'en';
 }
 
 export function parseSongs(value: unknown): Song[] {
@@ -15,11 +16,17 @@ export function parseSongs(value: unknown): Song[] {
       !('id' in song) || typeof song.id !== 'string' || !/^[\w-]{11}$/.test(song.id) ||
       !('title' in song) || typeof song.title !== 'string' || !song.title.trim() ||
       !('artist' in song) || typeof song.artist !== 'string' || !song.artist.trim() ||
+      !('language' in song) || (song.language !== 'fi' && song.language !== 'en') ||
       ids.has(song.id)
     ) {
       throw new Error('Tarkista laulujen tunnukset, nimet ja esittäjät. Tunnusten pitää olla yksilöllisiä.');
     }
     ids.add(song.id);
-    return { id: song.id, title: song.title.trim(), artist: song.artist.trim() };
+    return {
+      id: song.id,
+      title: song.title.trim(),
+      artist: song.artist.trim(),
+      language: song.language,
+    };
   });
 }

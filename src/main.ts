@@ -22,6 +22,11 @@ app.innerHTML = `
         <div class="stage-art" aria-hidden="true"><span>✦</span><strong>♫</strong><span>✧</span></div>
       </div>
       <div class="section-label"><h2>Meidän laulut</h2><span id="song-count"></span></div>
+      <div class="language-filters" role="group" aria-label="Valitse laulun kieli">
+        <button class="filter-button" type="button" data-language="all" aria-pressed="true">Kaikki</button>
+        <button class="filter-button" type="button" data-language="fi" aria-pressed="false">Suomi</button>
+        <button class="filter-button" type="button" data-language="en" aria-pressed="false">Englanti</button>
+      </div>
       <div id="songs" class="song-grid" aria-busy="true"></div>
       <p class="library-footnote">Vain perheen valitsemat laulut. Ei hakua, ei selattavaa videosyötettä.</p>
     </section>
@@ -57,6 +62,8 @@ let session = 0;
 let isPlaying = false;
 let selectedCard: HTMLButtonElement | undefined;
 let readyTimer: number | undefined;
+let catalog: Song[] = [];
+let selectedLanguage: 'all' | Song['language'] = 'all';
 
 function message(text: string): void {
   notice.textContent = text;
@@ -169,38 +176,8 @@ async function loadSongs(): Promise<void> {
   try {
     const response = await fetch(`${import.meta.env.BASE_URL}songs.json`, { cache: 'no-cache' });
     if (!response.ok) throw new Error(`Laululistan lataus epäonnistui: ${response.status}`);
-    const songs = parseSongs(await response.json());
-    element('song-count').textContent = `${songs.length} laulua`;
-    songs.forEach((song, index) => {
-      const card = document.createElement('button');
-      card.className = 'song-card';
-      card.setAttribute('aria-label', `${song.title}, ${song.artist}`);
-      const cover = document.createElement('div');
-      cover.className = 'cover';
-      const image = document.createElement('img');
-      image.src = `https://i.ytimg.com/vi/${song.id}/hqdefault.jpg`;
-      image.alt = '';
-      image.loading = 'lazy';
-      image.addEventListener('error', () => { image.hidden = true; });
-      const number = document.createElement('span');
-      number.className = 'song-number';
-      number.textContent = String(index + 1).padStart(2, '0');
-      const symbol = document.createElement('span');
-      symbol.className = 'card-play';
-      symbol.textContent = '▶';
-      symbol.setAttribute('aria-hidden', 'true');
-      cover.append(image, number, symbol);
-      const details = document.createElement('div');
-      details.className = 'song-details';
-      const title = document.createElement('h3');
-      title.textContent = song.title;
-      const artist = document.createElement('p');
-      artist.textContent = song.artist;
-      details.append(title, artist);
-      card.append(cover, details);
-      card.addEventListener('click', () => { void openSong(song, card); });
-      grid.append(card);
-    });
+    catalog = parseSongs(await response.json());
+    renderSongs();
   } catch (error) {
     console.error(error);
     message('Lauluja ei voitu ladata. Pyydä aikuista tarkistamaan verkkoyhteys ja songs.json-tiedosto.');
@@ -213,6 +190,60 @@ async function loadSongs(): Promise<void> {
     grid.setAttribute('aria-busy', 'false');
   }
 }
+
+function renderSongs(): void {
+  const grid = element('songs');
+  const songs = selectedLanguage === 'all'
+    ? catalog
+    : catalog.filter(song => song.language === selectedLanguage);
+  grid.replaceChildren();
+  element('song-count').textContent = `${songs.length} laulua`;
+  songs.forEach((song, index) => {
+    const card = document.createElement('button');
+    card.className = 'song-card';
+    card.setAttribute('aria-label', `${song.title}, ${song.artist}`);
+    const cover = document.createElement('div');
+    cover.className = 'cover';
+    const image = document.createElement('img');
+    image.src = `https://i.ytimg.com/vi/${song.id}/hqdefault.jpg`;
+    image.alt = '';
+    image.loading = 'lazy';
+    image.addEventListener('error', () => { image.hidden = true; });
+    const number = document.createElement('span');
+    number.className = 'song-number';
+    number.textContent = String(index + 1).padStart(2, '0');
+    const symbol = document.createElement('span');
+    symbol.className = 'card-play';
+    symbol.textContent = '▶';
+    symbol.setAttribute('aria-hidden', 'true');
+    cover.append(image, number, symbol);
+    const details = document.createElement('div');
+    details.className = 'song-details';
+    const title = document.createElement('h3');
+    title.textContent = song.title;
+    const artist = document.createElement('p');
+    artist.textContent = song.artist;
+    details.append(title, artist);
+    card.append(cover, details);
+    card.addEventListener('click', () => { void openSong(song, card); });
+    grid.append(card);
+  });
+}
+
+document.querySelectorAll<HTMLButtonElement>('.filter-button').forEach(button => {
+  button.addEventListener('click', () => {
+    const language = button.dataset.language;
+    if (language === 'all' || language === 'fi' || language === 'en') {
+      selectedLanguage = language;
+    } else {
+      throw new Error(`Unknown language filter: ${language}`);
+    }
+    document.querySelectorAll<HTMLButtonElement>('.filter-button').forEach(filter => {
+      filter.setAttribute('aria-pressed', String(filter === button));
+    });
+    renderSongs();
+  });
+});
 
 void loadSongs();
 if (!navigator.onLine) message('Olet offline-tilassa. Laulujen toisto tarvitsee verkkoyhteyden.');
